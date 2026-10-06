@@ -1,0 +1,8 @@
+{
+  "name": "sermon-osmu-lite",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Sermon downstream content skill pack",
+  "license": "MIT",
+  "dependencies": {"puppeteer": "^25.12.0"}
+}
