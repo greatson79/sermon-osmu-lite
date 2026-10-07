@@ -11,7 +11,7 @@ const roles = ['cover','empathy','struggle','text','message','gospel','quotation
 if (!Array.isArray(cards) || cards.length !== 10 || cards.some((c,i) => c.role !== roles[i] || typeof c.headline !== 'string' || typeof c.body !== 'string')) {
   throw new Error('10장 역할 순서와 headline/body 필수');
 }
-const fontUrl = 'file://' + encodeURI(path.resolve(__dirname, '../assets/fonts/NotoSansKR.ttf'));
+const fontUrl = require('url').pathToFileURL(path.resolve(__dirname, '../assets/fonts/NotoSansKR.ttf')).href;
 const church = process.argv[4] || '';
 const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><style>

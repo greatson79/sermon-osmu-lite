@@ -12,7 +12,7 @@
 
 let puppeteer;
 try { puppeteer = require('puppeteer'); } catch (e) {
-  console.log('텍스트 산출까지 완료 · 이 단계는 준비물이 없어 건너뜀 (필요: Node.js + Puppeteer — setup.sh 로 설치)');
+  console.log('텍스트 산출까지 완료 · 이 단계는 준비물이 없어 건너뜀 (필요: Node.js + Puppeteer — setup.sh·setup.ps1 로 설치)');
   process.exit(0);
 }
 const path = require('path');
@@ -40,7 +40,7 @@ const outDir = path.dirname(absHtml);
   // 4:5 출력: 540×675 CSS + deviceScaleFactor 2 = 1080×1350 PNG
   await page.setViewport({ width: 540, height: 675, deviceScaleFactor: 2 });
 
-  await page.goto(`file://${absHtml}`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await page.goto(require('url').pathToFileURL(absHtml).href, { waitUntil: 'networkidle0', timeout: 30000 });
 
   // 웹폰트 로딩 대기
   await page.evaluate(() => document.fonts.ready);

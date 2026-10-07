@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
+without=","
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --without) without=",${2:-},"; shift 2 || shift ;;
+    --without=*) without=",${1#--without=}," ; shift ;;
+    *) echo "사용: bash setup.sh [--without small-group,faith-essay]" >&2; exit 2 ;;
+  esac
+done
 pack_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 config_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 stamp="$(date +%Y%m%d-%H%M%S)"
@@ -19,12 +27,21 @@ backup_if_different() {
 for skill_dir in "$pack_dir"/.claude/skills/*; do
   [ -d "$skill_dir" ] || continue
   name="$(basename "$skill_dir")"
+  case "$without" in *",$name,"*) echo "제외: $name 스킬은 설치하지 않습니다(--without)."; continue ;; esac
   backup_if_different "$skill_dir" "$config_dir/skills/$name" "$name"
   mkdir -p "$config_dir/skills/$name"
   cp -R "$skill_dir/." "$config_dir/skills/$name/"
 done
 backup_if_different "$pack_dir/.claude/commands/주간콘텐츠.md" "$config_dir/commands/주간콘텐츠.md" "주간콘텐츠.md"
 cp "$pack_dir/.claude/commands/주간콘텐츠.md" "$config_dir/commands/주간콘텐츠.md"
+# 옛 판의 bash 도구 3개(고정 파일명)는 .py 로 바뀌었다 — 이미 설치된 곳에 남아 있으면 백업 폴더로 옮긴다.
+for old in check-tools.sh crop_4x5.sh loud.sh; do
+  if [ -e "$config_dir/sermon-osmu-tools/scripts/$old" ]; then
+    mkdir -p "$backup_dir"
+    mv "$config_dir/sermon-osmu-tools/scripts/$old" "$backup_dir/$old.bak-$stamp"
+    echo "백업: 옛 도구 $old 을(를) $backup_dir/$old.bak-$stamp 로 옮겼습니다."
+  fi
+done
 cp "$pack_dir"/scripts/* "$config_dir/sermon-osmu-tools/scripts/"
 mkdir -p "$config_dir/sermon-osmu-tools/assets"
 cp -R "$pack_dir/assets/fonts" "$config_dir/sermon-osmu-tools/assets/"
@@ -32,7 +49,8 @@ cp "$pack_dir/package.json" "$config_dir/sermon-osmu-tools/package.json"
 cp "$pack_dir/package-lock.json" "$config_dir/sermon-osmu-tools/package-lock.json"
 if [ "${SKIP_NODE_INSTALL:-0}" != "1" ]; then
   if command -v npm >/dev/null; then
-    npm ci --prefix "$config_dir/sermon-osmu-tools" --omit=dev \
+    # --prefix 대신 도구 폴더로 들어가 실행한다(npm 11.19 는 다른 프로젝트 폴더에서 --prefix 로 부르면 lock 불일치로 거부함)
+    (cd "$config_dir/sermon-osmu-tools" && npm ci --omit=dev) \
       || echo '안내: Puppeteer 설치에 실패했습니다. 카드·썸네일 이미지 단계는 건너뜁니다(텍스트 산출은 그대로 됩니다).'
   else
     echo '안내: npm 이 없어 Puppeteer 를 설치하지 않았습니다. 카드·썸네일 이미지 단계는 건너뜁니다(텍스트 산출은 그대로 됩니다). Node.js 설치 후 setup.sh 를 다시 실행하세요.'

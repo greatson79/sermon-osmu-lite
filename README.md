@@ -6,17 +6,40 @@ Wave AI Networks가 만들었습니다. MIT 라이선스.
 
 ## 설치 (한 줄)
 
+맥:
+
 ```bash
 git clone https://github.com/greatson79/sermon-osmu-lite && cd sermon-osmu-lite && bash setup.sh
 ```
 
-`setup.sh`는 명령과 스킬, 렌더 도구, 한글 서체를 Claude Code 설정 폴더(`~/.claude`)에 복사하고 Puppeteer를 설치합니다. 같은 이름의 스킬이나 명령이 이미 있고 내용이 다르면 덮기 전에 `~/.claude/sermon-osmu-backup/<이름>.bak-<날짜시각>`으로 옮기고 그 사실을 출력합니다. npm이 없으면 안내만 하고 나머지 설치는 끝낸 뒤 정상 종료합니다(이미지 단계만 건너뜀).
+윈도우 (PowerShell · 관리자 권한 필요 없음):
+
+```powershell
+git clone https://github.com/greatson79/sermon-osmu-lite; cd sermon-osmu-lite; powershell -NoProfile -ExecutionPolicy Bypass -File setup.ps1
+```
+
+git이 없으면 저장소 페이지의 Code → Download ZIP으로 받아 압축을 풀고, 그 폴더에서 마지막 한 줄(`powershell -NoProfile -ExecutionPolicy Bypass -File setup.ps1`)만 실행합니다. 이 한 줄은 PowerShell 실행 정책을 바꾸지 않고 이번 실행에만 통과시킵니다.
+
+이미 설치한 분은 저장소를 새로 받아(`git pull` 또는 ZIP 다시 받기) 위 설치 한 줄을 다시 실행하세요. 옛 `.sh` 도구는 백업 폴더로 옮겨지고 새 명령·스킬 문서로 바뀝니다.
+
+`setup.sh`·`setup.ps1`은 명령과 스킬, 렌더 도구, 한글 서체를 Claude Code 설정 폴더(맥 `~/.claude`, 윈도우 `%USERPROFILE%\.claude`, `CLAUDE_CONFIG_DIR`가 지정돼 있으면 그 폴더)에 복사하고 Puppeteer를 설치합니다. 같은 이름의 스킬이나 명령이 이미 있고 내용이 다르면 덮기 전에 `~/.claude/sermon-osmu-backup/<이름>.bak-<날짜시각>`으로 옮기고 그 사실을 출력합니다. npm이 없으면 안내만 하고 나머지 설치는 끝낸 뒤 정상 종료합니다(이미지 단계만 건너뜀).
+
+나눔지나 신앙에세이가 필요 없으면 설치 때 뺄 수 있습니다: `bash setup.sh --without small-group,faith-essay` (윈도우: `... -File setup.ps1 -Without small-group,faith-essay`). 뺀 스킬의 단계는 `/주간콘텐츠`가 오류 없이 건너뜁니다.
+
+## 윈도우 준비물
+
+Node.js(LTS), Python 3, ffmpeg가 필요합니다. 설치한 뒤에는 PowerShell을 새로 열어야 `node`·`python`·`ffmpeg`가 잡힙니다.
+
+- Node.js: https://nodejs.org/en/download
+- Python 3: https://www.python.org/downloads/ (설치 화면에서 「Add python.exe to PATH」를 켭니다)
+- ffmpeg: `winget install ffmpeg` (또는 https://www.gyan.dev/ffmpeg/builds/ 에서 내려받기)
+- Pillow(쇼릴용): `python -m pip install pillow`
 
 ## 시작 전 준비 3가지
 
 1. **Claude Code 로그인** — 폴더에서 `claude`를 실행해 로그인되어 있어야 합니다.
 2. **이미지 엔진** — 이 팩의 이미지 엔진은 Puppeteer(헤드리스 크롬)입니다. Node.js와 npm이 있으면 `setup.sh`가 설치합니다. 카드뉴스와 썸네일 PNG를 만듭니다.
-3. **ffmpeg + 유튜브 OAuth** — 쇼릴 영상은 ffmpeg와 Python Pillow(`pip install pillow`)가 필요합니다. 업로드까지 쓰려면 본인 유튜브 채널의 OAuth 클라이언트 JSON과 `pip install google-api-python-client google-auth-oauthlib`가 필요합니다.
+3. **ffmpeg + 유튜브 OAuth** — 쇼릴 영상은 ffmpeg와 Python Pillow(`python -m pip install pillow`)가 필요합니다. 업로드까지 쓰려면 본인 유튜브 채널의 OAuth 클라이언트 JSON과 `python -m pip install google-api-python-client google-auth-oauthlib`가 필요합니다.
 
 ## 원고 넣는 위치
 
@@ -52,14 +75,17 @@ git clone https://github.com/greatson79/sermon-osmu-lite && cd sermon-osmu-lite 
 - 기관 로고, 인물 사진, 음원은 동봉하지 않습니다. 쓰려면 사용권이 있는 자산을 직접 준비하세요. 썸네일은 인물·로고가 없으면 중립 템플릿을 씁니다.
 - 나눔지 PNG 캡처 도구는 없습니다. 나눔지는 문서까지가 산출입니다.
 - 쇼릴은 컷마다 정지 화면이라 한 장면이 2초보다 깁니다(3~7초).
+- 윈도우: 한글·공백이 든 폴더 경로는 GitHub Actions 윈도우 러너에서 경로를 흉내 낸 시험만 했습니다(실제 한글 계정 시험이 아님). 백신이 Puppeteer의 크롬 내려받기를 막으면 이미지 단계만 건너뛰어집니다.
 - 나눔지는 규칙상 원고 밖의 널리 알려진 이야기를 예로 들 수 있습니다. 그런 곳은 `[미확인]`으로 표시되니 설교자가 확인하세요.
 - 성경 본문(판본·구절)을 넣는 자리가 아직 없어서, 성경을 직접 인용하는 부분은 채워지지 않습니다.
 - 모든 산출물은 초안입니다. 사용 전 설교자가 원고와 대조해 검수하세요.
+- 리눅스는 시험하지 않았습니다.
 
 ## 구성
 
 - `.claude/commands/주간콘텐츠.md`: 진입 명령 (유일)
 - `.claude/skills/`: 단계별 한국어 스킬과 규칙
-- `scripts/`: 렌더·점검 도구
+- `scripts/`: 렌더·점검 도구(파이썬·Node 한 벌로 맥·윈도우 공통)
 - `assets/fonts/`: Noto Sans KR와 라이선스
+- `setup.sh`, `setup.ps1`: 설치기(맥 / 윈도우)
 - `NOTICE`, `LICENSE`: 출처와 MIT 라이선스

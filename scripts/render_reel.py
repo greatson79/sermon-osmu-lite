@@ -7,6 +7,7 @@ import subprocess
 import shutil
 import sys
 
+sys.stdout.reconfigure(encoding='utf-8')
 SKIP = '텍스트 산출까지 완료 · 이 단계는 준비물이 없어 건너뜀'
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -69,10 +70,11 @@ def main():
         if top > 1600: raise SystemExit(f'cut {i} exceeds 4:5 safe area')
         frame = frames / f'cut-{i:02d}.png'
         im.save(frame)
-        concat.extend([f"file '{frame}'", f"duration {float(cut['seconds']):.3f}"])
-    concat.append(f"file '{frame}'")
+        frame_ref = frame.as_posix().replace("'", "'\\''")
+        concat.extend([f"file '{frame_ref}'", f"duration {float(cut['seconds']):.3f}"])
+    concat.append(f"file '{frame_ref}'")
     playlist = frames / 'concat.txt'
-    playlist.write_text('\n'.join(concat) + '\n')
+    playlist.write_bytes(('\n'.join(concat) + '\n').encode('utf-8'))
     cmd = ['ffmpeg', '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', str(playlist)]
     if args.audio:
         cmd.extend(['-i', str(args.audio), '-map', '0:v', '-map', '1:a', '-shortest', '-c:a', 'aac'])
